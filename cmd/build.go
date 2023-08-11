@@ -4,8 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/myyrakle/gopring/internal/generator"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +13,7 @@ var buildCmd = &cobra.Command{
 	Use:   "build",
 	Short: "build the project",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("build called")
+		generator.Generate()
 	},
 }
 
