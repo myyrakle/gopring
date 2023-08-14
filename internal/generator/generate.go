@@ -38,7 +38,7 @@ func getDirList(basePath string) []string {
 	return dirList
 }
 
-func generateRootFile(basedir string) {
+func generateRootDefaultFile(basedir string) {
 	err := os.Mkdir(basedir, 0755)
 
 	if err != nil && !os.IsExist(err) {
@@ -46,7 +46,7 @@ func generateRootFile(basedir string) {
 	}
 }
 
-func generateRecursive(basedir string) {
+func generateRecursive(basedir string, output *RootOutput) {
 	packages := getPackageList(basedir)
 
 	for packageName, asts := range packages {
@@ -60,11 +60,23 @@ func generateRecursive(basedir string) {
 	dirList := getDirList(basedir)
 
 	for _, dir := range dirList {
-		generateRecursive(path.Join(basedir, dir))
+		generateRecursive(path.Join(basedir, dir), output)
 	}
 }
 
+type RootOutput struct {
+	importPackages      []string
+	injectedServices    []string
+	injectedControllers []string
+}
+
+func generateRootFile(output *RootOutput) {
+}
+
 func Generate() {
-	generateRootFile("dist")
-	generateRecursive("src")
+	generateRootDefaultFile("dist")
+
+	output := RootOutput{}
+	generateRecursive("src", &output)
+	generateRootFile(&output)
 }
