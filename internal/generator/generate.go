@@ -17,20 +17,28 @@ func generateRootDefaultFile(basedir string) {
 }
 
 type RootOutput struct {
-	importPackages      []string
-	injectedServices    []string
-	injectedControllers []string
+	OutputBasedir       string
+	ImportPackages      []string
+	Providers           []string
+	InjectedServices    []string
+	InjectedControllers []string
 }
 
 func generateRootFile(output *RootOutput) {
 	fmt.Printf(">> generate root file...\n")
 
 	importPackages := ""
-	for _, importPackage := range output.importPackages {
+	for _, importPackage := range output.ImportPackages {
 		importPackages += importPackage + "\n"
 	}
 
-	templateMap := map[string]string{importPackages: importPackages}
+	providers := ""
+	for _, provider := range output.Providers {
+		providers += provider + ",\n"
+	}
+
+	templateMap := map[string]string{"importPackages": importPackages, "providers": providers}
+
 	code := template.ReplaceTemplate(templates.ROOT_CODE_TEMPLATE, templateMap)
 
 	os.WriteFile("dist/main.go", []byte(code), 0644)
@@ -39,7 +47,9 @@ func generateRootFile(output *RootOutput) {
 func Generate() {
 	generateRootDefaultFile("dist")
 
-	output := RootOutput{}
+	output := RootOutput{
+		OutputBasedir: "dist",
+	}
 	generateRecursive("src", &output)
 	generateRootFile(&output)
 }

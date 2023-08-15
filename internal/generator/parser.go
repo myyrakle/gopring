@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"os"
 	"path"
 )
 
@@ -36,6 +37,7 @@ func generateRecursive(basedir string, output *RootOutput) {
 	dirList := getDirList(basedir)
 
 	for _, dir := range dirList {
+		os.Mkdir(path.Join(output.OutputBasedir, dir), 0755)
 		generateRecursive(path.Join(basedir, dir), output)
 	}
 }

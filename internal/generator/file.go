@@ -3,44 +3,54 @@ package generator
 import (
 	"go/ast"
 	"strings"
+
+	"github.com/myyrakle/gopring/internal/annotation"
 )
 
 // 주석을 읽어와서 @Service 구조체인지 검증합니다.
-func isService(genDecl *ast.GenDecl) bool {
+func getServiceAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 	if genDecl.Doc == nil {
-		return false
+		return nil
 	}
 
 	if genDecl.Doc.List == nil {
-		return false
+		return nil
 	}
 
 	for _, comment := range genDecl.Doc.List {
-		if strings.Contains(comment.Text, "@Entity") {
-			return true
+		if strings.Contains(comment.Text, "@Service") {
+
+			return &annotation.Annotaion{
+				Name: "Service",
+			}
 		}
 	}
 
-	return false
+	return nil
 }
 
 // 주석을 읽어와서 @Controller 구조체인지 검증합니다.
-func isController(genDecl *ast.GenDecl) bool {
+func getControllerAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 	if genDecl.Doc == nil {
-		return false
+		return nil
 	}
 
 	if genDecl.Doc.List == nil {
-		return false
+		return nil
 	}
 
 	for _, comment := range genDecl.Doc.List {
 		if strings.Contains(comment.Text, "@Controller") {
-			return true
+			parameters := annotation.ParseParameters(comment.Text)
+
+			return &annotation.Annotaion{
+				Name:       "Controller",
+				Parameters: parameters,
+			}
 		}
 	}
 
-	return false
+	return nil
 }
 
 func processFile(filename string, file *ast.File, output *RootOutput) {
@@ -58,11 +68,13 @@ func processFile(filename string, file *ast.File, output *RootOutput) {
 						continue
 					}
 
-					if isService(genDecl) {
+					serviceAnnotation := getServiceAnnotation(genDecl)
+					if serviceAnnotation != nil {
 						serviceCodes = append(serviceCodes, processService(structName, structDecl))
 					}
 
-					if isController(genDecl) {
+					controllerAnnotation := getControllerAnnotation(genDecl)
+					if controllerAnnotation != nil {
 						controllerCodes = append(controllerCodes, processContoller(structName, structDecl))
 					}
 				}

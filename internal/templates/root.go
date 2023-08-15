@@ -2,8 +2,6 @@ package templates
 
 const ROOT_CODE_TEMPLATE = `package main
 
-package main
-
 import (
 	echo "github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
