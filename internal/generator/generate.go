@@ -8,6 +8,9 @@ import (
 	"log"
 	"os"
 	"path"
+
+	"github.com/myyrakle/gopring/internal/templates"
+	"github.com/myyrakle/gopring/pkg/template"
 )
 
 func getPackageList(basePath string) map[string]*ast.Package {
@@ -52,7 +55,7 @@ func generateRecursive(basedir string, output *RootOutput) {
 	for packageName, asts := range packages {
 		fmt.Printf(">> package [%s]...\n", packageName)
 
-		for filename, _ := range asts.Files {
+		for filename := range asts.Files {
 			fmt.Printf(">> scan [%s]...\n", filename)
 		}
 	}
@@ -71,6 +74,11 @@ type RootOutput struct {
 }
 
 func generateRootFile(output *RootOutput) {
+	fmt.Printf(">> generate root file...\n")
+
+	code := template.ReplaceTemplate(templates.ROOT_CODE_TEMPLATE, map[string]string{})
+
+	os.WriteFile("dist/main.go", []byte(code), 0644)
 }
 
 func Generate() {
