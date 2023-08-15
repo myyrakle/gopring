@@ -4,7 +4,7 @@ import (
 	"go/ast"
 )
 
-func processFile(filename string, file *ast.File, output *RootOutput) {
+func processFile(packageName string, filename string, file *ast.File, output *RootOutput) string {
 	var serviceCodes []string
 	var controllerCodes []string
 
@@ -21,7 +21,7 @@ func processFile(filename string, file *ast.File, output *RootOutput) {
 
 					serviceAnnotation := getServiceAnnotation(genDecl)
 					if serviceAnnotation != nil {
-						serviceCodes = append(serviceCodes, processService(structName, structDecl))
+						serviceCodes = append(serviceCodes, processService(packageName, structName, structDecl, output))
 					}
 
 					controllerAnnotation := getControllerAnnotation(genDecl)
@@ -32,4 +32,18 @@ func processFile(filename string, file *ast.File, output *RootOutput) {
 			}
 		}
 	}
+
+	codeToAppend := ""
+
+	for _, serviceCode := range serviceCodes {
+		codeToAppend += serviceCode + "\n"
+	}
+
+	codeToAppend += "\n"
+
+	for _, controllerCode := range controllerCodes {
+		codeToAppend += controllerCode + "\n"
+	}
+
+	return codeToAppend
 }

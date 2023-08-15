@@ -29,10 +29,13 @@ func getServiceAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 	return nil
 }
 
-func processService(structName string, structDecl *ast.StructType) string {
+func processService(packageName string, structName string, structDecl *ast.StructType, output *RootOutput) string {
 	var newFunctionCode string
+	newFunctionName := "GopringNewService" + structName
 
-	newFunctionCode += "func GopringNewService" + structName + "("
+	output.Providers = append(output.Providers, packageName+"."+newFunctionName)
+
+	newFunctionCode += "func " + newFunctionName + "("
 
 	for _, field := range structDecl.Fields.List {
 		typeName := field.Type.(*ast.Ident).Name
@@ -42,7 +45,7 @@ func processService(structName string, structDecl *ast.StructType) string {
 	}
 
 	newFunctionCode += ") *" + structName + " {\n"
-	newFunctionCode += "return &" + structName + "{\n"
+	newFunctionCode += "\treturn &" + structName + "{\n"
 
 	for _, field := range structDecl.Fields.List {
 		fieldName := field.Names[0].Name
@@ -50,6 +53,7 @@ func processService(structName string, structDecl *ast.StructType) string {
 		newFunctionCode += fieldName + ": " + fieldName + ",\n"
 	}
 
+	newFunctionCode += "\t}\n"
 	newFunctionCode += "}\n"
 
 	return newFunctionCode
