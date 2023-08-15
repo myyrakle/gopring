@@ -7,8 +7,8 @@ package main
 import (
 	echo "github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	fx "go.uber.org/fx"
-)
+	fx "go.uber.org/fx" 
+{{importPackages}})
 
 func RunGopring() {
 	app := echo.New()

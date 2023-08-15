@@ -55,8 +55,10 @@ func generateRecursive(basedir string, output *RootOutput) {
 	for packageName, asts := range packages {
 		fmt.Printf(">> package [%s]...\n", packageName)
 
-		for filename := range asts.Files {
+		for filename, file := range asts.Files {
 			fmt.Printf(">> scan [%s]...\n", filename)
+
+			processFile(filename, file, output)
 		}
 	}
 
