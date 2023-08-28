@@ -14,6 +14,8 @@ func RunGopring() {
 	app.Use(middleware.Logger())
 	app.Use(middleware.Recover())
 
+	{{routes}}}
+
 	app.Logger.Fatal(app.Start(":8080"))
 }
 

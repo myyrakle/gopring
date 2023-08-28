@@ -35,6 +35,7 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 
 	codeToAppend := ""
 
+	// 서비스 코드들을 apppend할 코드에 추가합니다.
 	for _, serviceCode := range serviceCodes {
 		codeToAppend += serviceCode + "\n"
 	}
@@ -44,6 +45,8 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 	for _, controllerCode := range controllerCodes {
 		codeToAppend += controllerCode + "\n"
 	}
+
+	//fmt.Println(codeToAppend)
 
 	return codeToAppend
 }
