@@ -13,6 +13,7 @@ import (
 	"github.com/myyrakle/gopring/pkg/template"
 )
 
+// 해당 경로의 패키지 목록을 가져옵니다.
 func getPackageList(basePath string) map[string]*ast.Package {
 	fset := token.NewFileSet()
 
@@ -25,6 +26,7 @@ func getPackageList(basePath string) map[string]*ast.Package {
 	return packages
 }
 
+// 재귀적으로 해당 경로와 하위 경로의 디렉토리 목록을 조회합니다.
 func generateRecursive(basedir string, output *RootOutput) {
 	packages := getPackageList(basedir)
 
