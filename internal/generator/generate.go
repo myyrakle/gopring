@@ -91,7 +91,7 @@ func generateRootFile(output *RootOutput) {
 		providers += provider + ",\n"
 	}
 
-	templateMap := map[string]string{"importPackages": importPackages, "providers": providers}
+	templateMap := map[string]string{"importPackages": importPackages, "providers": providers, "routes": ""}
 
 	code := template.ReplaceTemplate(templates.ROOT_CODE_TEMPLATE, templateMap)
 
