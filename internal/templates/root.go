@@ -6,7 +6,8 @@ import (
 	echo "github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	fx "go.uber.org/fx" 
-{{importPackages}})
+{{importPackages}}
+)
 
 func RunGopring() {
 	app := echo.New()
@@ -14,13 +15,15 @@ func RunGopring() {
 	app.Use(middleware.Logger())
 	app.Use(middleware.Recover())
 
-	{{routes}}}
+	{{routes}}
 
 	app.Logger.Fatal(app.Start(":8080"))
 }
 
 func main() {
-	providers := fx.Provide({{providers}})
+	providers := fx.Provide(
+		{{providers}}
+	)
 
 	fx.New(providers, fx.Invoke(RunGopring)).Run()
 }

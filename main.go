@@ -3,7 +3,9 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 */
 package main
 
-import "github.com/myyrakle/gopring/cmd"
+import (
+	"github.com/myyrakle/gopring/cmd"
+)
 
 func main() {
 	cmd.Execute()
