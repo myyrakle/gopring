@@ -4,7 +4,6 @@ import (
 	"go/ast"
 )
 
-// 
 func processFile(packageName string, filename string, file *ast.File, output *RootOutput) string {
 	var serviceCodes []string
 	var controllerCodes []string
@@ -27,7 +26,7 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 
 					controllerAnnotation := getControllerAnnotation(genDecl)
 					if controllerAnnotation != nil {
-						controllerCodes = append(controllerCodes, processContoller(structName, structDecl))
+						controllerCodes = append(controllerCodes, processContoller(packageName, structName, structDecl))
 					}
 				}
 			}

@@ -30,13 +30,13 @@ func getPackageList(basePath string) map[string]*ast.Package {
 // 재귀적으로 해당 경로와 하위 경로의 디렉토리 목록을 조회합니다.
 func generateRecursive(basedir string, output *RootOutput) {
 	packages := getPackageList(basedir)
-	alias := alias.GetNextPackageAlias()
+	packageAlias := alias.GetNextPackageAlias()
 
 	for packageName, asts := range packages {
 		fmt.Printf(">> package [%s]...\n", packageName)
 
-		importPackage := "\t" + alias + " \"" + ModuleName + "/" + strings.Replace(basedir, "src/", "dist/", 1) + "\""
-		output.ImportPackages = append(output.ImportPackages, importPackage)
+		importPackage := "\t" + packageAlias + " \"" + ModuleName + "/" + strings.Replace(basedir, "src/", "dist/", 1) + "\""
+		output.ImportPackages[packageAlias] = importPackage
 
 		for filename, file := range asts.Files {
 			fmt.Printf(">> scan [%s]...\n", filename)
@@ -48,7 +48,7 @@ func generateRecursive(basedir string, output *RootOutput) {
 			}
 
 			originalCode := string(text)
-			codeToAppend := processFile(packageName, filename, file, output)
+			codeToAppend := processFile(packageAlias, filename, file, output)
 
 			newPath := strings.Replace(filename, "src", output.OutputBasedir, 1)
 
@@ -74,7 +74,7 @@ func generateRootDefaultFile(basedir string) {
 
 type RootOutput struct {
 	OutputBasedir       string
-	ImportPackages      []string
+	ImportPackages      map[string]string
 	Providers           []string
 	InjectedServices    []string
 	InjectedControllers []string
@@ -85,8 +85,10 @@ func generateRootFile(output *RootOutput) {
 	fmt.Printf(">> generate root file...\n")
 
 	importPackages := ""
-	for _, importPackage := range output.ImportPackages {
-		importPackages += importPackage + "\n"
+	for packageAlias, importPackage := range output.ImportPackages {
+		if alias.PackageAliasRefCount[packageAlias] > 0 {
+			importPackages += importPackage + "\n"
+		}
 	}
 
 	providers := ""
@@ -110,7 +112,8 @@ func Generate() {
 	generateRootDefaultFile("dist")
 
 	output := RootOutput{
-		OutputBasedir: "dist",
+		OutputBasedir:  "dist",
+		ImportPackages: map[string]string{},
 	}
 	generateRecursive("src", &output)
 	generateRootFile(&output)

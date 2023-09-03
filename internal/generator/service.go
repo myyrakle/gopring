@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/myyrakle/gopring/internal/annotation"
+	"github.com/myyrakle/gopring/pkg/alias"
 )
 
 // 주석을 읽어와서 @Service 구조체인지 검증합니다.
@@ -55,6 +56,8 @@ func processService(packageName string, structName string, structDecl *ast.Struc
 
 	newFunctionCode += "\t}\n"
 	newFunctionCode += "}\n"
+
+	alias.PackageAliasRefCount[packageName]++
 
 	return newFunctionCode
 }

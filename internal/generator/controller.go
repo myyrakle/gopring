@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/myyrakle/gopring/internal/annotation"
+	"github.com/myyrakle/gopring/pkg/alias"
 )
 
 // 주석을 읽어와서 @Controller 구조체인지 검증합니다.
@@ -31,7 +32,7 @@ func getControllerAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 	return nil
 }
 
-func processContoller(structName string, structDecl *ast.StructType) string {
+func processContoller(packageName, structName string, structDecl *ast.StructType) string {
 	var newFunctionCode string
 
 	newFunctionCode += "func GopringNewController" + structName + "("
@@ -53,6 +54,8 @@ func processContoller(structName string, structDecl *ast.StructType) string {
 	}
 
 	newFunctionCode += "}\n"
+
+	alias.PackageAliasRefCount[packageName]++
 
 	return newFunctionCode
 }
