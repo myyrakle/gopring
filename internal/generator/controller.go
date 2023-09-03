@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"fmt"
 	"go/ast"
 	"strings"
 
@@ -22,6 +23,9 @@ func getControllerAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 		if strings.Contains(comment.Text, "@Controller") {
 			parameters := annotation.ParseParameters(comment.Text)
 
+			fmt.Println("???")
+			fmt.Println(parameters)
+
 			return &annotation.Annotaion{
 				Name:       "Controller",
 				Parameters: parameters,
@@ -32,7 +36,7 @@ func getControllerAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 	return nil
 }
 
-func processContoller(packageName, structName string, structDecl *ast.StructType) string {
+func processContoller(packageName string, annotaion annotation.Annotaion, structName string, structDecl *ast.StructType) string {
 	var newFunctionCode string
 
 	newFunctionCode += "func GopringNewController" + structName + "("

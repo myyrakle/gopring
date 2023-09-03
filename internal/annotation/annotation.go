@@ -7,7 +7,7 @@ type Annotaion struct {
 	Parameters []string
 }
 
-// "@Service(1, 2, 3)" => []string{"1", "2", "3"}
+// @Service(1, "2", 3) => []string{"1", "2", "3"}
 func ParseParameters(commentText string) []string {
 	parameters := []string{}
 
@@ -15,7 +15,32 @@ func ParseParameters(commentText string) []string {
 		return parameters
 	}
 
-	parametersText := strings.TrimSuffix(strings.Split(commentText, "(")[1], ")")
+	parametersText := strings.Split(commentText, "(")[1]
+
+	buffer := []byte{}
+	for i := 0; i < len(parametersText); i++ {
+		if parametersText[i] == ')' {
+			if len(buffer) > 0 {
+				parameters = append(parameters, string(buffer))
+			}
+			break
+		}
+
+		if parametersText[i] == ',' {
+			if len(buffer) > 0 {
+				parameters = append(parameters, string(buffer))
+				buffer = []byte{}
+			}
+
+			continue
+		}
+
+		if parametersText[i] == '"' {
+			continue
+		}
+
+		buffer = append(buffer, parametersText[i])
+	}
 
 	for _, parameter := range strings.Split(parametersText, ",") {
 		parameters = append(parameters, strings.TrimSpace(parameter))

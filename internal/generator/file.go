@@ -4,6 +4,7 @@ import (
 	"go/ast"
 )
 
+// 각 파일 하나하나에 대한 처리를 수행합니다.
 func processFile(packageName string, filename string, file *ast.File, output *RootOutput) string {
 	var serviceCodes []string
 	var controllerCodes []string
@@ -26,7 +27,7 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 
 					controllerAnnotation := getControllerAnnotation(genDecl)
 					if controllerAnnotation != nil {
-						controllerCodes = append(controllerCodes, processContoller(packageName, structName, structDecl))
+						controllerCodes = append(controllerCodes, processContoller(packageName, *controllerAnnotation, structName, structDecl))
 					}
 				}
 			}
