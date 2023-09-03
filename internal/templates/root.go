@@ -6,7 +6,8 @@ import (
 	echo "github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	fx "go.uber.org/fx" 
-{{importPackages}})
+{{importPackages}}
+)
 
 func RunGopring() {
 	app := echo.New()
@@ -20,7 +21,9 @@ func RunGopring() {
 }
 
 func main() {
-	providers := fx.Provide({{providers}})
+	providers := fx.Provide(
+		{{providers}}
+	)
 
 	fx.New(providers, fx.Invoke(RunGopring)).Run()
 }
