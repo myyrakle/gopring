@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/myyrakle/gopring/internal/templates"
+	"github.com/myyrakle/gopring/pkg/alias"
 	"github.com/myyrakle/gopring/pkg/template"
 )
 
@@ -29,11 +30,12 @@ func getPackageList(basePath string) map[string]*ast.Package {
 // 재귀적으로 해당 경로와 하위 경로의 디렉토리 목록을 조회합니다.
 func generateRecursive(basedir string, output *RootOutput) {
 	packages := getPackageList(basedir)
+	alias := alias.GetNextPackageAlias()
 
 	for packageName, asts := range packages {
 		fmt.Printf(">> package [%s]...\n", packageName)
 
-		importPackage := "\t\"" + ModuleName + "/" + strings.Replace(basedir, "src/", "dist/", 1) + "\""
+		importPackage := "\t" + alias + " \"" + ModuleName + "/" + strings.Replace(basedir, "src/", "dist/", 1) + "\""
 		output.ImportPackages = append(output.ImportPackages, importPackage)
 
 		for filename, file := range asts.Files {
@@ -76,6 +78,7 @@ type RootOutput struct {
 	Providers           []string
 	InjectedServices    []string
 	InjectedControllers []string
+	RoutesCode          []string
 }
 
 func generateRootFile(output *RootOutput) {
@@ -91,7 +94,12 @@ func generateRootFile(output *RootOutput) {
 		providers += provider + ",\n"
 	}
 
-	templateMap := map[string]string{"importPackages": importPackages, "providers": providers, "routes": ""}
+	routes := ""
+	for _, route := range output.RoutesCode {
+		routes += route + "\n"
+	}
+
+	templateMap := map[string]string{"importPackages": importPackages, "providers": providers, "routes": routes}
 
 	code := template.ReplaceTemplate(templates.ROOT_CODE_TEMPLATE, templateMap)
 
