@@ -1,6 +1,8 @@
 package annotation
 
-import "strings"
+import (
+	"strings"
+)
 
 type Annotaion struct {
 	Name       string
@@ -17,13 +19,17 @@ func ParseParameters(commentText string) []string {
 
 	parametersText := strings.Split(commentText, "(")[1]
 
+	// find last ')'. if exists, then remove it
+	if strings.Contains(parametersText, ")") {
+		parametersText = strings.Split(parametersText, ")")[0]
+	} else {
+		return parameters
+	}
+
 	buffer := []byte{}
 	for i := 0; i < len(parametersText); i++ {
-		if parametersText[i] == ')' {
-			if len(buffer) > 0 {
-				parameters = append(parameters, string(buffer))
-			}
-			break
+		if parametersText[i] == ' ' {
+			continue
 		}
 
 		if parametersText[i] == ',' {
@@ -42,8 +48,8 @@ func ParseParameters(commentText string) []string {
 		buffer = append(buffer, parametersText[i])
 	}
 
-	for _, parameter := range strings.Split(parametersText, ",") {
-		parameters = append(parameters, strings.TrimSpace(parameter))
+	if len(buffer) > 0 {
+		parameters = append(parameters, string(buffer))
 	}
 
 	return parameters

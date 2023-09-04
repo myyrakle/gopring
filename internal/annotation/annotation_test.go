@@ -27,7 +27,7 @@ func Test_ParseParameters(t *testing.T) {
 		got := ParseParameters(testCase.input)
 
 		if !reflect.DeepEqual(got, testCase.want) {
-			t.Errorf("ParseParameters(%s) = %v, want %v", testCase.input, got, testCase.want)
+			t.Errorf("ParseParameters(%s) = %#v, want %#v", testCase.input, got, testCase.want)
 		}
 	}
 }
