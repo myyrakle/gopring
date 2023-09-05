@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"fmt"
 	"go/ast"
 )
 
@@ -12,16 +11,29 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 
 	for _, declare := range file.Decls {
 		if fn, ok := declare.(*ast.FuncDecl); ok {
-			fmt.Println("@#@#", fn.Name, fn.Doc)
-			if fn.Recv != nil {
-				if len(fn.Recv.List) > 0 {
-					if ident, ok := fn.Recv.List[0].Type.(*ast.Ident); ok {
-						fmt.Println("@#@#", ident.Name)
-						// if ident.Name == "HomeController" {
-						// 	fmt.Printf("Receiver method: %s\n", fn.Name.Name)
-						// }
+			mappingAnnotaion := getMappingAnnotaion(fn)
+			controllerName := ""
+
+			if mappingAnnotaion != nil {
+				if fn.Recv != nil {
+					if len(fn.Recv.List) > 0 {
+
+						// 포인터 리시버
+						if starExpr, ok := fn.Recv.List[0].Type.(*ast.StarExpr); ok {
+							controllerName = starExpr.X.(*ast.Ident).Name
+						}
+
+						// 값 리시버
+						if ident, ok := fn.Recv.List[0].Type.(*ast.Ident); ok {
+							controllerName = ident.Name
+						}
 					}
 				}
+
+			}
+
+			if controllerName != "" {
+				// TODO
 			}
 		}
 

@@ -8,6 +8,6 @@ type HomeController struct {
 }
 
 // @GetMapping("/")
-func (this *HomeController) Index() string {
+func (this HomeController) Index() string {
 	return this.service.GetHello()
 }
