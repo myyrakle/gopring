@@ -10,6 +10,33 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 	var controllerCodes []string
 
 	for _, declare := range file.Decls {
+		if fn, ok := declare.(*ast.FuncDecl); ok {
+			mappingAnnotaion := getMappingAnnotaion(fn)
+			controllerName := ""
+
+			if mappingAnnotaion != nil {
+				if fn.Recv != nil {
+					if len(fn.Recv.List) > 0 {
+
+						// 포인터 리시버
+						if starExpr, ok := fn.Recv.List[0].Type.(*ast.StarExpr); ok {
+							controllerName = starExpr.X.(*ast.Ident).Name
+						}
+
+						// 값 리시버
+						if ident, ok := fn.Recv.List[0].Type.(*ast.Ident); ok {
+							controllerName = ident.Name
+						}
+					}
+				}
+
+			}
+
+			if controllerName != "" {
+				// TODO
+			}
+		}
+
 		if genDecl, ok := declare.(*ast.GenDecl); ok {
 			for _, spec := range genDecl.Specs {
 				if typeSpec, ok := spec.(*ast.TypeSpec); ok {
