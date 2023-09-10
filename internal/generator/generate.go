@@ -74,8 +74,6 @@ func generateRootDefaultFile(basedir string) {
 	}
 }
 
-
-
 func generateRootFile(output *RootOutput) {
 	fmt.Printf(">> generate root file...\n")
 
@@ -96,7 +94,17 @@ func generateRootFile(output *RootOutput) {
 		routes += route + "\n"
 	}
 
-	templateMap := map[string]string{"importPackages": importPackages, "providers": providers, "routes": routes}
+	params := ""
+	for _, param := range output.RunGopringParameters {
+		params += param + ", "
+	}
+
+	templateMap := map[string]string{
+		"importPackages": importPackages,
+		"providers":      providers,
+		"routes":         routes,
+		"params":         params,
+	}
 
 	code := template.ReplaceTemplate(templates.ROOT_CODE_TEMPLATE, templateMap)
 
