@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"fmt"
 	"go/ast"
 	"strings"
 
@@ -19,12 +18,13 @@ func getControllerAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 		return nil
 	}
 
+	if len(genDecl.Doc.List) == 0 {
+		return nil
+	}
+
 	for _, comment := range genDecl.Doc.List {
 		if strings.Contains(comment.Text, "@Controller") {
 			parameters := annotation.ParseParameters(comment.Text)
-
-			fmt.Println("???")
-			fmt.Println(parameters)
 
 			return &annotation.Annotaion{
 				Name:       "Controller",
@@ -42,10 +42,12 @@ func processContoller(packageName string, annotaion annotation.Annotaion, struct
 	newFunctionCode += "func GopringNewController" + structName + "("
 
 	for _, field := range structDecl.Fields.List {
-		typeName := field.Type.(*ast.Ident).Name
-		fieldName := field.Names[0].Name
+		if ident, ok := field.Type.(*ast.Ident); ok {
+			typeName := ident.Name
+			fieldName := field.Names[0].Name
 
-		newFunctionCode += fieldName + " " + typeName + ", "
+			newFunctionCode += fieldName + " " + typeName + ", "
+		}
 	}
 
 	newFunctionCode += ") *" + structName + " {\n"
@@ -57,6 +59,7 @@ func processContoller(packageName string, annotaion annotation.Annotaion, struct
 		newFunctionCode += fieldName + ": " + fieldName + ",\n"
 	}
 
+	newFunctionCode += "\t}\n"
 	newFunctionCode += "}\n"
 
 	alias.PackageAliasRefCount[packageName]++

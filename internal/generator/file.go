@@ -47,6 +47,8 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 						continue
 					}
 
+					//fmt.Println(">> struct [" + structName + "]...")
+
 					serviceAnnotation := getServiceAnnotation(genDecl)
 					if serviceAnnotation != nil {
 						serviceCodes = append(serviceCodes, processService(packageName, structName, structDecl, output))
