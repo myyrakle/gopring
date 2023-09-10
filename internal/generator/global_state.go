@@ -10,3 +10,13 @@ type ControllerInfo struct {
 }
 
 var ControllerList []ControllerInfo = make([]ControllerInfo, 0)
+
+func FindByPackageAliasAndControllerName(packageAlias string, controllerName string) *ControllerInfo {
+	for _, controller := range ControllerList {
+		if controller.packageAlias == packageAlias && controller.controllerName == controllerName {
+			return &controller
+		}
+	}
+
+	return nil
+}

@@ -1,7 +1,9 @@
 package generator
 
 import (
+	"fmt"
 	"go/ast"
+	"path"
 	"strings"
 
 	"github.com/myyrakle/gopring/internal/annotation"
@@ -93,7 +95,9 @@ func getMappingAnnotaion(ast *ast.FuncDecl) *annotation.Annotaion {
 	return nil
 }
 
-func processMapping(packageName string, controllerName string, mappingAnnotaion annotation.Annotaion, output *RootOutput) {
+func processMapping(packageName string, receiverName string, mappingAnnotaion annotation.Annotaion, fn *ast.FuncDecl, output *RootOutput) {
+	functionName := fn.Name.Name
+
 	method := ""
 
 	switch mappingAnnotaion.Name {
@@ -115,9 +119,37 @@ func processMapping(packageName string, controllerName string, mappingAnnotaion 
 		return
 	}
 
-	route := `	app.` + method + `("/", func(c echo.Context) error {
-		return c.String(200, gc000001.Index())
-	})`
+	controllerInfo := FindByPackageAliasAndControllerName(packageName, receiverName)
+
+	if controllerInfo == nil {
+		return
+	}
+
+	if controllerInfo.annotation == nil {
+		return
+	}
+
+	if controllerInfo.annotation.Parameters == nil {
+		return
+	}
+
+	controllerPath := "/"
+
+	if len(controllerInfo.annotation.Parameters) > 0 {
+		controllerPath = controllerInfo.annotation.Parameters[0]
+	}
+
+	mappingPath := "/"
+
+	if len(mappingAnnotaion.Parameters) > 0 {
+		mappingPath = mappingAnnotaion.Parameters[0]
+	}
+
+	routePath := path.Join(controllerPath, mappingPath)
+
+	route := fmt.Sprintf(`	app.%s("%s", func(c echo.Context) error {
+		return c.String(200, %s.%s(c))
+	})`, method, routePath, controllerInfo.controllerAlias, functionName)
 
 	output.RoutesCode = append(output.RoutesCode, route)
 }

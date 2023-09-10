@@ -41,7 +41,7 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 	for _, declare := range file.Decls {
 		if fn, ok := declare.(*ast.FuncDecl); ok {
 			mappingAnnotaion := getMappingAnnotaion(fn)
-			controllerName := ""
+			receiverName := ""
 
 			if mappingAnnotaion != nil {
 				if fn.Recv != nil {
@@ -49,20 +49,20 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 
 						// 포인터 리시버
 						if starExpr, ok := fn.Recv.List[0].Type.(*ast.StarExpr); ok {
-							controllerName = starExpr.X.(*ast.Ident).Name
+							receiverName = starExpr.X.(*ast.Ident).Name
 						}
 
 						// 값 리시버
 						if ident, ok := fn.Recv.List[0].Type.(*ast.Ident); ok {
-							controllerName = ident.Name
+							receiverName = ident.Name
 						}
 					}
 				}
 
 			}
 
-			if controllerName != "" {
-				// TODO
+			if receiverName != "" {
+				processMapping(packageName, receiverName, *mappingAnnotaion, fn, output)
 			}
 		}
 	}

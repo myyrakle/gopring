@@ -93,6 +93,13 @@ func processContoller(packageName string, annotaion annotation.Annotaion, struct
 
 	alias.PackageAliasRefCount[packageName]++
 
+	controllerInfo := ControllerInfo{
+		controllerName:  structName,
+		controllerAlias: controllerAlias,
+		packageAlias:    packageName,
+		annotation:      &annotaion,
+	}
+	ControllerList = append(ControllerList, controllerInfo)
+
 	return newFunctionCode
 }
-
