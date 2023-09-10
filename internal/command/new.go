@@ -32,10 +32,10 @@ func New(projectName string) {
 	}
 	fmt.Println(">> create " + projectName + "/src/service")
 
-	os.WriteFile(projectName+"/src/service/home_service", []byte(templates.HOME_SERVICE), 0755)
+	os.WriteFile(projectName+"/src/service/home_service.go", []byte(templates.HOME_SERVICE), 0755)
 	fmt.Println(">> create service: " + projectName + "/src/service/home_service")
 
-	os.WriteFile(projectName+"/src/controller/home_controller", []byte(templates.HOME_CONTROLLER), 0755)
+	os.WriteFile(projectName+"/src/controller/home_controller.go", []byte(templates.HOME_CONTROLLER), 0755)
 	fmt.Println(">> create controller: " + projectName + "/src/controller/home_controller")
 
 	fmt.Println(">>> finished")
