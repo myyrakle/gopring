@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"fmt"
 	"go/ast"
 	"strings"
 
@@ -41,17 +42,42 @@ func processContoller(packageName string, annotaion annotation.Annotaion, struct
 
 	newFunctionCode += "func GopringNewController" + structName + "("
 
+	//parameters := []string{}
+
 	for _, field := range structDecl.Fields.List {
-		if ident, ok := field.Type.(*ast.Ident); ok {
+		fieldName := field.Names[0].Name
+		typeExpr := field.Type
+		typeName := ""
+
+		if expr, ok := typeExpr.(*ast.StarExpr); ok {
+			typeName += "*"
+			typeExpr = expr.X
+		}
+
+		if expr, ok := typeExpr.(*ast.SelectorExpr); ok {
+			if ident, ok := expr.X.(*ast.Ident); ok {
+				packageName := ident.Name
+				typeName += packageName + "." + expr.Sel.Name
+
+				newFunctionCode += fieldName + " " + typeName + ", "
+				continue
+			}
+		}
+
+		if ident, ok := typeExpr.(*ast.Ident); ok {
 			typeName := ident.Name
-			fieldName := field.Names[0].Name
+
+			fmt.Println(">> " + fieldName + " : " + typeName)
+			typeName += ident.Name
+
+			fmt.Println(">> " + fieldName + " : " + typeName)
 
 			newFunctionCode += fieldName + " " + typeName + ", "
 		}
 	}
 
 	newFunctionCode += ") *" + structName + " {\n"
-	newFunctionCode += "return &" + structName + "{\n"
+	newFunctionCode += "\treturn &" + structName + "{\n"
 
 	for _, field := range structDecl.Fields.List {
 		fieldName := field.Names[0].Name
