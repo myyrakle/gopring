@@ -37,12 +37,13 @@ func getControllerAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 	return nil
 }
 
-func processContoller(packageName string, annotaion annotation.Annotaion, structName string, structDecl *ast.StructType) string {
+func processContoller(packageName string, annotaion annotation.Annotaion, structName string, structDecl *ast.StructType, output *RootOutput) string {
 	var newFunctionCode string
+	newFunctionName := "GopringNewController" + structName
 
-	newFunctionCode += "func GopringNewController" + structName + "("
+	output.Providers = append(output.Providers, packageName+"."+newFunctionName)
 
-	//parameters := []string{}
+	newFunctionCode += "func " + newFunctionName + "("
 
 	for _, field := range structDecl.Fields.List {
 		fieldName := field.Names[0].Name

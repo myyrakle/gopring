@@ -56,7 +56,7 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 
 					controllerAnnotation := getControllerAnnotation(genDecl)
 					if controllerAnnotation != nil {
-						controllerCodes = append(controllerCodes, processContoller(packageName, *controllerAnnotation, structName, structDecl))
+						controllerCodes = append(controllerCodes, processContoller(packageName, *controllerAnnotation, structName, structDecl, output))
 					}
 				}
 			}
