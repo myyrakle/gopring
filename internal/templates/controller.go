@@ -4,7 +4,7 @@ const HOME_CONTROLLER = `package controller
 
 import (
 	"github.com/labstack/echo"
-	"github.com/myyrakle/gopring/src/service"
+	"{{projectName}}/src/service"
 )
 
 // @Controller(/)
