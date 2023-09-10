@@ -43,7 +43,7 @@ func processContoller(packageName string, annotaion annotation.Annotaion, struct
 	controllerAlias := alias.GetNextControllerAlias()
 
 	output.Providers = append(output.Providers, packageName+"."+newFunctionName)
-	output.RunGopringParameters = append(output.RunGopringParameters, controllerAlias+" "+packageName+"."+structName)
+	output.RunGopringParameters = append(output.RunGopringParameters, controllerAlias+" *"+packageName+"."+structName)
 
 	newFunctionCode += "func " + newFunctionName + "("
 
