@@ -9,6 +9,35 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 	var serviceCodes []string
 	var controllerCodes []string
 
+	// Controller & Service
+	for _, declare := range file.Decls {
+		if genDecl, ok := declare.(*ast.GenDecl); ok {
+			for _, spec := range genDecl.Specs {
+				if typeSpec, ok := spec.(*ast.TypeSpec); ok {
+					structDecl, _ := typeSpec.Type.(*ast.StructType)
+					structName := typeSpec.Name.Name
+
+					if structDecl == nil {
+						continue
+					}
+
+					//fmt.Println(">> struct [" + structName + "]...")
+
+					serviceAnnotation := getServiceAnnotation(genDecl)
+					if serviceAnnotation != nil {
+						serviceCodes = append(serviceCodes, processService(packageName, structName, structDecl, output))
+					}
+
+					controllerAnnotation := getControllerAnnotation(genDecl)
+					if controllerAnnotation != nil {
+						controllerCodes = append(controllerCodes, processContoller(packageName, *controllerAnnotation, structName, structDecl, output))
+					}
+				}
+			}
+		}
+	}
+
+	// Mappings
 	for _, declare := range file.Decls {
 		if fn, ok := declare.(*ast.FuncDecl); ok {
 			mappingAnnotaion := getMappingAnnotaion(fn)
@@ -34,31 +63,6 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 
 			if controllerName != "" {
 				// TODO
-			}
-		}
-
-		if genDecl, ok := declare.(*ast.GenDecl); ok {
-			for _, spec := range genDecl.Specs {
-				if typeSpec, ok := spec.(*ast.TypeSpec); ok {
-					structDecl, _ := typeSpec.Type.(*ast.StructType)
-					structName := typeSpec.Name.Name
-
-					if structDecl == nil {
-						continue
-					}
-
-					//fmt.Println(">> struct [" + structName + "]...")
-
-					serviceAnnotation := getServiceAnnotation(genDecl)
-					if serviceAnnotation != nil {
-						serviceCodes = append(serviceCodes, processService(packageName, structName, structDecl, output))
-					}
-
-					controllerAnnotation := getControllerAnnotation(genDecl)
-					if controllerAnnotation != nil {
-						controllerCodes = append(controllerCodes, processContoller(packageName, *controllerAnnotation, structName, structDecl, output))
-					}
-				}
 			}
 		}
 	}

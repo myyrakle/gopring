@@ -92,3 +92,32 @@ func getMappingAnnotaion(ast *ast.FuncDecl) *annotation.Annotaion {
 
 	return nil
 }
+
+func processMapping(packageName string, controllerName string, mappingAnnotaion annotation.Annotaion, output *RootOutput) {
+	method := ""
+
+	switch mappingAnnotaion.Name {
+	case "GetMapping":
+		method = "GET"
+	case "PostMapping":
+		method = "POST"
+	case "PutMapping":
+		method = "PUT"
+	case "DeleteMapping":
+		method = "DELETE"
+	case "PatchMapping":
+		method = "PATCH"
+	case "HeadMapping":
+		method = "HEAD"
+	case "OptionsMapping":
+		method = "OPTIONS"
+	default:
+		return
+	}
+
+	route := `	app.` + method + `("/", func(c echo.Context) error {
+		return c.String(200, gc000001.Index())
+	})`
+
+	output.RoutesCode = append(output.RoutesCode, route)
+}
