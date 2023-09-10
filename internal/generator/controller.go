@@ -56,7 +56,7 @@ func processContoller(packageName string, annotaion annotation.Annotaion, struct
 	for _, field := range structDecl.Fields.List {
 		fieldName := field.Names[0].Name
 
-		newFunctionCode += fieldName + ": " + fieldName + ",\n"
+		newFunctionCode += "\t\t" + fieldName + ": " + fieldName + ",\n"
 	}
 
 	newFunctionCode += "\t}\n"

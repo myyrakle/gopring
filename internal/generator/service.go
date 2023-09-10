@@ -51,7 +51,7 @@ func processService(packageName string, structName string, structDecl *ast.Struc
 	for _, field := range structDecl.Fields.List {
 		fieldName := field.Names[0].Name
 
-		newFunctionCode += fieldName + ": " + fieldName + ",\n"
+		newFunctionCode += "\t\t" + fieldName + ": " + fieldName + ",\n"
 	}
 
 	newFunctionCode += "\t}\n"
