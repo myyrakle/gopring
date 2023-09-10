@@ -1,6 +1,9 @@
 package controller
 
-import "github.com/myyrakle/gopring/src/service"
+import (
+	"github.com/labstack/echo"
+	"github.com/myyrakle/gopring/src/service"
+)
 
 // @Controller(/)
 type HomeController struct {
@@ -8,6 +11,11 @@ type HomeController struct {
 }
 
 // @GetMapping("/")
-func (this HomeController) Index() string {
+func (this HomeController) Index(c echo.Context) string {
+	return this.service.GetHello()
+}
+
+// @GetMapping("/health")
+func (this *HomeController) HelathCheck(c echo.Context) string {
 	return this.service.GetHello()
 }

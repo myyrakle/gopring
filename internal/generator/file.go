@@ -9,34 +9,8 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 	var serviceCodes []string
 	var controllerCodes []string
 
+	// Controller & Service
 	for _, declare := range file.Decls {
-		if fn, ok := declare.(*ast.FuncDecl); ok {
-			mappingAnnotaion := getMappingAnnotaion(fn)
-			controllerName := ""
-
-			if mappingAnnotaion != nil {
-				if fn.Recv != nil {
-					if len(fn.Recv.List) > 0 {
-
-						// 포인터 리시버
-						if starExpr, ok := fn.Recv.List[0].Type.(*ast.StarExpr); ok {
-							controllerName = starExpr.X.(*ast.Ident).Name
-						}
-
-						// 값 리시버
-						if ident, ok := fn.Recv.List[0].Type.(*ast.Ident); ok {
-							controllerName = ident.Name
-						}
-					}
-				}
-
-			}
-
-			if controllerName != "" {
-				// TODO
-			}
-		}
-
 		if genDecl, ok := declare.(*ast.GenDecl); ok {
 			for _, spec := range genDecl.Specs {
 				if typeSpec, ok := spec.(*ast.TypeSpec); ok {
@@ -59,6 +33,36 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 						controllerCodes = append(controllerCodes, processContoller(packageName, *controllerAnnotation, structName, structDecl, output))
 					}
 				}
+			}
+		}
+	}
+
+	// Mappings
+	for _, declare := range file.Decls {
+		if fn, ok := declare.(*ast.FuncDecl); ok {
+			mappingAnnotaion := getMappingAnnotaion(fn)
+			receiverName := ""
+
+			if mappingAnnotaion != nil {
+				if fn.Recv != nil {
+					if len(fn.Recv.List) > 0 {
+
+						// 포인터 리시버
+						if starExpr, ok := fn.Recv.List[0].Type.(*ast.StarExpr); ok {
+							receiverName = starExpr.X.(*ast.Ident).Name
+						}
+
+						// 값 리시버
+						if ident, ok := fn.Recv.List[0].Type.(*ast.Ident); ok {
+							receiverName = ident.Name
+						}
+					}
+				}
+
+			}
+
+			if receiverName != "" {
+				processMapping(packageName, receiverName, *mappingAnnotaion, fn, output)
 			}
 		}
 	}
