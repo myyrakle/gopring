@@ -19,12 +19,13 @@ func getControllerAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 		return nil
 	}
 
+	if len(genDecl.Doc.List) == 0 {
+		return nil
+	}
+
 	for _, comment := range genDecl.Doc.List {
 		if strings.Contains(comment.Text, "@Controller") {
 			parameters := annotation.ParseParameters(comment.Text)
-
-			fmt.Println("???")
-			fmt.Println(parameters)
 
 			return &annotation.Annotaion{
 				Name:       "Controller",
@@ -36,27 +37,56 @@ func getControllerAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 	return nil
 }
 
-func processContoller(packageName string, annotaion annotation.Annotaion, structName string, structDecl *ast.StructType) string {
+func processContoller(packageName string, annotaion annotation.Annotaion, structName string, structDecl *ast.StructType, output *RootOutput) string {
 	var newFunctionCode string
+	newFunctionName := "GopringNewController" + structName
 
-	newFunctionCode += "func GopringNewController" + structName + "("
+	output.Providers = append(output.Providers, packageName+"."+newFunctionName)
+
+	newFunctionCode += "func " + newFunctionName + "("
 
 	for _, field := range structDecl.Fields.List {
-		typeName := field.Type.(*ast.Ident).Name
 		fieldName := field.Names[0].Name
+		typeExpr := field.Type
+		typeName := ""
 
-		newFunctionCode += fieldName + " " + typeName + ", "
+		if expr, ok := typeExpr.(*ast.StarExpr); ok {
+			typeName += "*"
+			typeExpr = expr.X
+		}
+
+		if expr, ok := typeExpr.(*ast.SelectorExpr); ok {
+			if ident, ok := expr.X.(*ast.Ident); ok {
+				packageName := ident.Name
+				typeName += packageName + "." + expr.Sel.Name
+
+				newFunctionCode += fieldName + " " + typeName + ", "
+				continue
+			}
+		}
+
+		if ident, ok := typeExpr.(*ast.Ident); ok {
+			typeName := ident.Name
+
+			fmt.Println(">> " + fieldName + " : " + typeName)
+			typeName += ident.Name
+
+			fmt.Println(">> " + fieldName + " : " + typeName)
+
+			newFunctionCode += fieldName + " " + typeName + ", "
+		}
 	}
 
 	newFunctionCode += ") *" + structName + " {\n"
-	newFunctionCode += "return &" + structName + "{\n"
+	newFunctionCode += "\treturn &" + structName + "{\n"
 
 	for _, field := range structDecl.Fields.List {
 		fieldName := field.Names[0].Name
 
-		newFunctionCode += fieldName + ": " + fieldName + ",\n"
+		newFunctionCode += "\t\t" + fieldName + ": " + fieldName + ",\n"
 	}
 
+	newFunctionCode += "\t}\n"
 	newFunctionCode += "}\n"
 
 	alias.PackageAliasRefCount[packageName]++

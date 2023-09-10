@@ -2,7 +2,7 @@ package controller
 
 import "github.com/myyrakle/gopring/src/service"
 
-// @Contoller(/)
+// @Controller(/)
 type HomeController struct {
 	service *service.HomeService
 }

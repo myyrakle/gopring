@@ -95,7 +95,7 @@ func generateRootFile(output *RootOutput) {
 
 	providers := ""
 	for _, provider := range output.Providers {
-		providers += provider + ",\n"
+		providers += provider + ",\n\t\t"
 	}
 
 	routes := ""
