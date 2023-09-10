@@ -74,14 +74,7 @@ func generateRootDefaultFile(basedir string) {
 	}
 }
 
-type RootOutput struct {
-	OutputBasedir       string
-	ImportPackages      map[string]string
-	Providers           []string
-	InjectedServices    []string
-	InjectedControllers []string
-	RoutesCode          []string
-}
+
 
 func generateRootFile(output *RootOutput) {
 	fmt.Printf(">> generate root file...\n")
