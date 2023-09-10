@@ -7,6 +7,7 @@ import (
 )
 
 func Run() {
+	exec.Command("go", "mod", "tidy").Run()
 	generator.Generate()
 	exec.Command("go", "run", "dist/main.go").Run()
 }

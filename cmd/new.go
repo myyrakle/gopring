@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/myyrakle/gopring/internal/command"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +15,14 @@ var newCmd = &cobra.Command{
 	Use:   "new",
 	Short: "create a new project",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("new called")
+		if len(args) == 0 {
+			fmt.Println("please specify the project name")
+			return
+		}
+
+		packageName := args[0]
+
+		command.New(packageName)
 	},
 }
 
