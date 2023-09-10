@@ -14,9 +14,9 @@ func New(projectName string) {
 	}
 	fmt.Println(">>> create project: " + projectName)
 
-	exec.Command("cd", projectName).Run()
-	exec.Command("go", "mod", "init", projectName).Run()
-	exec.Command("cd", "..").Run()
+	modCommand := exec.Command("go", "mod", "init", projectName)
+	modCommand.Dir = projectName
+	modCommand.Run()
 	fmt.Println(">> go mod init " + projectName)
 
 	if err := os.Mkdir(projectName+"/src", 0755); err != nil {
