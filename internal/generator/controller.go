@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"fmt"
 	"go/ast"
 	"strings"
 
@@ -42,6 +41,7 @@ func processContoller(packageName string, annotaion annotation.Annotaion, struct
 	newFunctionName := "GopringNewController" + structName
 
 	output.Providers = append(output.Providers, packageName+"."+newFunctionName)
+	output.RunGopringParameters = append(output.RunGopringParameters, packageName+"."+structName)
 
 	newFunctionCode += "func " + newFunctionName + "("
 
@@ -60,7 +60,9 @@ func processContoller(packageName string, annotaion annotation.Annotaion, struct
 				packageName := ident.Name
 				typeName += packageName + "." + expr.Sel.Name
 
-				newFunctionCode += fieldName + " " + typeName + ", "
+				field := fieldName + " " + typeName
+
+				newFunctionCode += field + ", "
 				continue
 			}
 		}
@@ -68,12 +70,10 @@ func processContoller(packageName string, annotaion annotation.Annotaion, struct
 		if ident, ok := typeExpr.(*ast.Ident); ok {
 			typeName := ident.Name
 
-			fmt.Println(">> " + fieldName + " : " + typeName)
-			typeName += ident.Name
+			field := fieldName + " " + typeName
 
-			fmt.Println(">> " + fieldName + " : " + typeName)
-
-			newFunctionCode += fieldName + " " + typeName + ", "
+			newFunctionCode += field + ", "
+			continue
 		}
 	}
 
