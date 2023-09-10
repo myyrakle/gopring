@@ -9,7 +9,7 @@ import (
 {{importPackages}}
 )
 
-func RunGopring() {
+func RunGopring({{params}}) {
 	app := echo.New()
 
 	app.Use(middleware.Logger())
