@@ -120,4 +120,12 @@ func Generate() {
 	}
 	generateRecursive("src", &output)
 	generateRootFile(&output)
+
+	cleanup()
+}
+
+func cleanup() {
+	if os.IsExist(os.Remove("_temp.go")) {
+		os.Remove("_temp.go")
+	}
 }
