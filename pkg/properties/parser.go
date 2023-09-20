@@ -1,47 +1,36 @@
 package properties
 
-import "strings"
+import (
+	"strings"
+)
 
-type PropertiesNode struct {
-	IsLeaf bool
-	Value  string
-	Childs map[string]PropertiesNode
+type Property struct {
+	Key   string
+	Value string
 }
 
-func ParseProperties(rawString string) PropertiesNode {
+type Properties = []Property
+
+func ParseProperties(rawString string) Properties {
 	lines := strings.Split(rawString, "\n")
 
-	root := PropertiesNode{
-		IsLeaf: false,
-		Value:  "",
-		Childs: make(map[string]PropertiesNode),
-	}
-
-	lastChild := root
+	properties := make(Properties, 0)
 
 	for _, line := range lines {
+
 		if strings.Contains(line, "=") {
 			splited := strings.Split(line, "=")
-			left := splited[0]
-			right := splited[1]
+			left := strings.TrimSpace(splited[0])
+			right := strings.TrimSpace(splited[1])
 
-			leftSplited := strings.Split(left, ".")
-			for _, namespace := range leftSplited {
-				newChild := PropertiesNode{
-					IsLeaf: false,
-					Value:  "",
-					Childs: make(map[string]PropertiesNode),
-				}
-				lastChild.Childs[namespace] = newChild
-				lastChild = newChild
-			}
-
-			lastChild.IsLeaf = true
-			lastChild.Value = right
+			properties = append(properties, Property{
+				Key:   left,
+				Value: right,
+			})
 		} else {
 			continue
 		}
 	}
 
-	return root
+	return properties
 }
