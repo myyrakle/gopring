@@ -47,5 +47,8 @@ func New(projectName string) {
 	os.WriteFile(projectName+"/src/controller/home_controller.go", []byte(controllerCode), 0755)
 	fmt.Println(">> create controller: " + projectName + "/src/controller/home_controller.go")
 
+	os.WriteFile(projectName+"/application.properties", []byte(templates.APPLICATION_PROPERTIES_TEMPLATE), 0755)
+	fmt.Println(">> create apllication.properties: " + projectName + "/apllication.properties")
+
 	fmt.Println(">>> finished")
 }
