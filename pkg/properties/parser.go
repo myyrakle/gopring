@@ -34,3 +34,13 @@ func ParseProperties(rawString string) Properties {
 
 	return properties
 }
+
+func FindByKey(self Properties, key string) *Property {
+	for _, property := range self {
+		if property.Key == key {
+			return &property
+		}
+	}
+
+	return nil
+}
