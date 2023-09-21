@@ -4,7 +4,7 @@ const ROOT_CODE_TEMPLATE = `package main
 
 import (
 	"os"
-	
+
 	echo "github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	fx "go.uber.org/fx" 
@@ -56,3 +56,7 @@ func main() {
 	fx.New(providers, fx.Invoke(RunGopring)).Run()
 }
 `
+
+const APPLICATION_PROPERTIES_TEMPLATE = `server.port = 7777
+spring.profiles = dev
+spring.application.name = demo`
