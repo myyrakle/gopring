@@ -4,7 +4,7 @@ type RootOutput struct {
 	OutputBasedir        string
 	ImportPackages       map[string]string
 	Providers            []string
-	InjectedServices     []string
+	InjectedComponents   []string
 	InjectedControllers  []string
 	RoutesCode           []string
 	RunGopringParameters []string

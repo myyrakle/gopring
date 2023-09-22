@@ -8,8 +8,8 @@ import (
 	"github.com/myyrakle/gopring/pkg/alias"
 )
 
-// 주석을 읽어와서 @Service 구조체인지 검증합니다.
-func getServiceAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
+// 주석을 읽어와서 @Component 계열 구조체인지 검증합니다.
+func getComponentAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 	if genDecl.Doc == nil {
 		return nil
 	}
@@ -19,10 +19,12 @@ func getServiceAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 	}
 
 	for _, comment := range genDecl.Doc.List {
-		if strings.Contains(comment.Text, "@Service") {
+		if strings.Contains(comment.Text, "@Service") ||
+			strings.Contains(comment.Text, "@Repository") ||
+			strings.Contains(comment.Text, "@Component") {
 
 			return &annotation.Annotaion{
-				Name: "Service",
+				Name: "Component",
 			}
 		}
 	}
@@ -30,9 +32,9 @@ func getServiceAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 	return nil
 }
 
-func processService(packageName string, structName string, structDecl *ast.StructType, output *RootOutput) string {
+func processComponent(packageName string, structName string, structDecl *ast.StructType, output *RootOutput) string {
 	var newFunctionCode string
-	newFunctionName := "GopringNewService" + structName
+	newFunctionName := "GopringNewComponent_" + structName
 
 	output.Providers = append(output.Providers, packageName+"."+newFunctionName)
 

@@ -38,7 +38,7 @@ func getControllerAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 
 func processContoller(packageName string, annotaion annotation.Annotaion, structName string, structDecl *ast.StructType, output *RootOutput) string {
 	var newFunctionCode string
-	newFunctionName := "GopringNewController" + structName
+	newFunctionName := "GopringNewController_" + structName
 
 	controllerAlias := alias.GetNextControllerAlias()
 
@@ -47,6 +47,7 @@ func processContoller(packageName string, annotaion annotation.Annotaion, struct
 
 	newFunctionCode += "func " + newFunctionName + "("
 
+	// Controller 구조체 필드를 순회해서, newFunctionCode에 DI받을 종속성을 추가
 	for _, field := range structDecl.Fields.List {
 		fieldName := field.Names[0].Name
 		typeExpr := field.Type
