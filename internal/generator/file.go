@@ -6,7 +6,7 @@ import (
 
 // 각 파일 하나하나에 대한 처리를 수행합니다.
 func processFile(packageName string, filename string, file *ast.File, output *RootOutput) string {
-	var serviceCodes []string
+	var componentCodes []string
 	var controllerCodes []string
 
 	// Controller & Service
@@ -21,11 +21,9 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 						continue
 					}
 
-					//fmt.Println(">> struct [" + structName + "]...")
-
-					serviceAnnotation := getServiceAnnotation(genDecl)
-					if serviceAnnotation != nil {
-						serviceCodes = append(serviceCodes, processService(packageName, structName, structDecl, output))
+					componentAnnotation := getComponentAnnotation(genDecl)
+					if componentAnnotation != nil {
+						componentCodes = append(componentCodes, processComponent(packageName, structName, structDecl, output))
 					}
 
 					controllerAnnotation := getControllerAnnotation(genDecl)
@@ -70,8 +68,8 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 	codeToAppend := ""
 
 	// 서비스 코드들을 apppend할 코드에 추가합니다.
-	for _, serviceCode := range serviceCodes {
-		codeToAppend += serviceCode + "\n"
+	for _, componentCode := range componentCodes {
+		codeToAppend += componentCode + "\n"
 	}
 
 	codeToAppend += "\n"
@@ -79,8 +77,6 @@ func processFile(packageName string, filename string, file *ast.File, output *Ro
 	for _, controllerCode := range controllerCodes {
 		codeToAppend += controllerCode + "\n"
 	}
-
-	//fmt.Println(codeToAppend)
 
 	return codeToAppend
 }

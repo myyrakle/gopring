@@ -38,7 +38,7 @@ func getControllerAnnotation(genDecl *ast.GenDecl) *annotation.Annotaion {
 
 func processContoller(packageName string, annotaion annotation.Annotaion, structName string, structDecl *ast.StructType, output *RootOutput) string {
 	var newFunctionCode string
-	newFunctionName := "GopringNewController" + structName
+	newFunctionName := "GopringNewController_" + structName
 
 	controllerAlias := alias.GetNextControllerAlias()
 
