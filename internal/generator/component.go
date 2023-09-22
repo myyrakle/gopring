@@ -41,10 +41,35 @@ func processComponent(packageName string, structName string, structDecl *ast.Str
 	newFunctionCode += "func " + newFunctionName + "("
 
 	for _, field := range structDecl.Fields.List {
-		typeName := field.Type.(*ast.Ident).Name
 		fieldName := field.Names[0].Name
+		typeExpr := field.Type
+		typeName := ""
 
-		newFunctionCode += fieldName + " " + typeName + ", "
+		if expr, ok := typeExpr.(*ast.StarExpr); ok {
+			typeName += "*"
+			typeExpr = expr.X
+		}
+
+		if expr, ok := typeExpr.(*ast.SelectorExpr); ok {
+			if ident, ok := expr.X.(*ast.Ident); ok {
+				packageName := ident.Name
+				typeName += packageName + "." + expr.Sel.Name
+
+				field := fieldName + " " + typeName
+
+				newFunctionCode += field + ", "
+				continue
+			}
+		}
+
+		if ident, ok := typeExpr.(*ast.Ident); ok {
+			typeName := ident.Name
+
+			field := fieldName + " " + typeName
+
+			newFunctionCode += field + ", "
+			continue
+		}
 	}
 
 	newFunctionCode += ") *" + structName + " {\n"
