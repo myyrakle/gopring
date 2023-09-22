@@ -148,7 +148,9 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 	routePath := path.Join(controllerPath, mappingPath)
 
 	route := fmt.Sprintf(`	app.%s("%s", func(c echo.Context) error {
-		return c.String(200, %s.%s(c))
+		response := %s.%s(c)
+
+		return c.JSON(200, response)
 	})`, method, routePath, controllerInfo.controllerAlias, functionName)
 
 	output.RoutesCode = append(output.RoutesCode, route)
