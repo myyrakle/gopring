@@ -6,7 +6,7 @@ import (
 )
 
 // 각 파일 하나하나에 대한 처리를 수행합니다.
-func processFile(packageName string, filename string, file *ast.File, originalCode *string, output *RootOutput) string {
+func processFile(packageName string, filename string, file *ast.File, originalCode *string, originalBytes []byte, output *RootOutput) string {
 	var componentCodes []string
 	var controllerCodes []string
 
@@ -75,7 +75,7 @@ func processFile(packageName string, filename string, file *ast.File, originalCo
 			}
 
 			if receiverName != "" {
-				processMapping(packageName, receiverName, *mappingAnnotaion, fn, originalCode, importsMap, output)
+				processMapping(packageName, receiverName, *mappingAnnotaion, fn, originalBytes, importsMap, output)
 			}
 		}
 	}

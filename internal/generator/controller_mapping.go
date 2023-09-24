@@ -98,7 +98,7 @@ func getMappingAnnotaion(ast *ast.FuncDecl) *annotation.Annotaion {
 	return nil
 }
 
-func processMapping(packageName string, receiverName string, mappingAnnotaion annotation.Annotaion, fn *ast.FuncDecl, originalCode *string, importsMap map[string]string, output *RootOutput) {
+func processMapping(packageName string, receiverName string, mappingAnnotaion annotation.Annotaion, fn *ast.FuncDecl, originalBytes []byte, importsMap map[string]string, output *RootOutput) {
 	functionName := fn.Name.Name
 
 	// method 선택
@@ -162,6 +162,7 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 	startIndex := functionStartIndex
 	for _, param := range fn.Type.Params.List {
 		paramName := param.Names[0].Name
+
 		selecorName := ast_util.GetSelectorNameFromType(param.Type)
 		paramType := ast_util.GetTypeNameFromType(param.Type)
 
@@ -171,7 +172,7 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 		buffer := []byte{}
 
 		for i := startIndex; i < paramStartIndex; i++ {
-			buffer = append(buffer, (*originalCode)[i])
+			buffer = append(buffer, originalBytes[i])
 		}
 		startIndex = paramEndIndex
 
