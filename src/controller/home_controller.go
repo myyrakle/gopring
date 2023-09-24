@@ -30,10 +30,6 @@ func (this *HomeController) HelathCheck(c echo.Context) HealthCheckResponse {
 func (this *HomeController) GetUserByUserId(
 	c echo.Context,
 	// @PathVariable("id")
-	/* @PathVariable("id2")*/
-	/*
-		@PathVariable("id3")
-	*/
 	id string,
 ) HealthCheckResponse {
 	return HealthCheckResponse{

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/myyrakle/gopring/internal/annotation"
+	"github.com/myyrakle/gopring/internal/comment"
 )
 
 func getMappingAnnotaion(ast *ast.FuncDecl) *annotation.Annotaion {
@@ -150,10 +151,16 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 
 	routePath := path.Join(controllerPath, mappingPath)
 
+	// mapping 함수에 넘길 파라미터 목록
+	parameterListToMapping := []string{}
+	codeListBeforeMappingCall := []string{}
+
 	// Parameter 목록 조회
 	functionStartIndex := int(fn.Type.Params.Opening)
 	startIndex := functionStartIndex
 	for _, param := range fn.Type.Params.List {
+		paramName := param.Names[0].Name
+
 		paramStartIndex := int(param.Pos()) - 1
 		paramEndIndex := int(param.End())
 
@@ -167,19 +174,40 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 		// 파라미터 앞에 있으니까 아마도 주석일거임
 		maybeCommentText := strings.TrimSpace(string(buffer))
 
-		fmt.Println(maybeCommentText)
-		//paramName := param.Names[0].Name
+		comments := comment.ParseCommentBlocks(maybeCommentText)
 
-		if strings.Contains(maybeCommentText, "//") || strings.Contains(maybeCommentText, "/*") {
+		if len(comments) == 0 {
 			continue
+		}
+
+		for _, commentText := range comments {
+			if strings.Contains(commentText, "@PathVariable") {
+				annotationParameters := annotation.ParseParameters(commentText)
+				pathName := ""
+
+				if len(annotationParameters) == 0 {
+					pathName = paramName
+				} else {
+					pathName = annotationParameters[0]
+				}
+
+				code := fmt.Sprintf(`	%s := c.Param("%s")`, pathName, pathName)
+
+				parameterListToMapping = append(parameterListToMapping, pathName)
+				codeListBeforeMappingCall = append(codeListBeforeMappingCall, code)
+			}
 		}
 	}
 
+	parametersToMapping := strings.Join(parameterListToMapping, ", ")
+	codesBeforeMappingCall := strings.Join(codeListBeforeMappingCall, "\n")
+
 	route := fmt.Sprintf(`	app.%s("%s", func(c echo.Context) error {
-		response := %s.%s(c)
+		%s
+		response := %s.%s(c, %s)
 
 		return c.JSON(200, response)
-	})`, method, routePath, controllerInfo.controllerAlias, functionName)
+	})`, method, routePath, codesBeforeMappingCall, controllerInfo.controllerAlias, functionName, parametersToMapping)
 
 	output.RoutesCode = append(output.RoutesCode, route)
 }
