@@ -50,7 +50,7 @@ func generateRecursive(basedir string, output *RootOutput) {
 			originalCode := string(text)
 			replacedCode := replaceImportPath(originalCode)
 
-			codeToAppend := processFile(packageAlias, filename, file, output)
+			codeToAppend := processFile(packageAlias, filename, file, &originalCode, output)
 
 			newPath := strings.Replace(filename, "src", output.OutputBasedir, 1)
 

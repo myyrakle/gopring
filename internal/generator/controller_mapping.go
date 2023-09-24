@@ -95,9 +95,10 @@ func getMappingAnnotaion(ast *ast.FuncDecl) *annotation.Annotaion {
 	return nil
 }
 
-func processMapping(packageName string, receiverName string, mappingAnnotaion annotation.Annotaion, fn *ast.FuncDecl, output *RootOutput) {
+func processMapping(packageName string, receiverName string, mappingAnnotaion annotation.Annotaion, fn *ast.FuncDecl, originalCode *string, output *RootOutput) {
 	functionName := fn.Name.Name
 
+	// method 선택
 	method := ""
 
 	switch mappingAnnotaion.Name {
@@ -119,6 +120,7 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 		return
 	}
 
+	// Controller 어노테이션 정보 가져오기
 	controllerInfo := FindByPackageAliasAndControllerName(packageName, receiverName)
 
 	if controllerInfo == nil {
@@ -133,6 +135,7 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 		return
 	}
 
+	// 상세 경로 지정
 	controllerPath := "/"
 
 	if len(controllerInfo.annotation.Parameters) > 0 {
@@ -146,6 +149,31 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 	}
 
 	routePath := path.Join(controllerPath, mappingPath)
+
+	// Parameter 목록 조회
+	functionStartIndex := int(fn.Type.Params.Opening)
+	startIndex := functionStartIndex
+	for _, param := range fn.Type.Params.List {
+		paramStartIndex := int(param.Pos()) - 1
+		paramEndIndex := int(param.End())
+
+		buffer := []byte{}
+
+		for i := startIndex; i < paramStartIndex; i++ {
+			buffer = append(buffer, (*originalCode)[i])
+		}
+		startIndex = paramEndIndex
+
+		// 파라미터 앞에 있으니까 아마도 주석일거임
+		maybeCommentText := strings.TrimSpace(string(buffer))
+
+		fmt.Println(maybeCommentText)
+		//paramName := param.Names[0].Name
+
+		if strings.Contains(maybeCommentText, "//") || strings.Contains(maybeCommentText, "/*") {
+			continue
+		}
+	}
 
 	route := fmt.Sprintf(`	app.%s("%s", func(c echo.Context) error {
 		response := %s.%s(c)
