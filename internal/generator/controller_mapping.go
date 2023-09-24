@@ -191,10 +191,28 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 					pathName = annotationParameters[0]
 				}
 
-				code := fmt.Sprintf(`	%s := c.Param("%s")`, pathName, pathName)
+				code := fmt.Sprintf(`		%s := c.Param("%s")`, pathName, pathName)
 
 				parameterListToMapping = append(parameterListToMapping, pathName)
 				codeListBeforeMappingCall = append(codeListBeforeMappingCall, code)
+				continue
+			}
+
+			if strings.Contains(commentText, "@RequestParam") {
+				annotationParameters := annotation.ParseParameters(commentText)
+				pathName := ""
+
+				if len(annotationParameters) == 0 {
+					pathName = paramName
+				} else {
+					pathName = annotationParameters[0]
+				}
+
+				code := fmt.Sprintf(`		%s := c.QueryParam("%s")`, pathName, pathName)
+
+				parameterListToMapping = append(parameterListToMapping, pathName)
+				codeListBeforeMappingCall = append(codeListBeforeMappingCall, code)
+				continue
 			}
 		}
 	}
@@ -203,7 +221,7 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 	codesBeforeMappingCall := strings.Join(codeListBeforeMappingCall, "\n")
 
 	route := fmt.Sprintf(`	app.%s("%s", func(c echo.Context) error {
-		%s
+%s
 		response := %s.%s(c, %s)
 
 		return c.JSON(200, response)
