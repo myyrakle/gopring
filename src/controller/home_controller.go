@@ -31,6 +31,8 @@ func (this *HomeController) GetUserByUserId(
 	c echo.Context,
 	// @PathVariable("id")
 	id string,
+	// @RequestParam("name")
+	name string,
 ) HealthCheckResponse {
 	return HealthCheckResponse{
 		Ok: true,
