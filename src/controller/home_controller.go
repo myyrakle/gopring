@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/labstack/echo"
+	"github.com/myyrakle/gopring/src/dto"
 	"github.com/myyrakle/gopring/src/service"
 )
 
@@ -33,6 +34,17 @@ func (this *HomeController) GetUserByUserId(
 	id string,
 	// @RequestParam("name")
 	name string,
+) HealthCheckResponse {
+	return HealthCheckResponse{
+		Ok: true,
+	}
+}
+
+// @PostMapping("/auth/login")
+func (this *HomeController) Login(
+	c echo.Context,
+	// @RequestBody
+	body dto.LoginRequest,
 ) HealthCheckResponse {
 	return HealthCheckResponse{
 		Ok: true,

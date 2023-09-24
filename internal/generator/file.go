@@ -2,12 +2,27 @@ package generator
 
 import (
 	"go/ast"
+	"strings"
 )
 
 // 각 파일 하나하나에 대한 처리를 수행합니다.
 func processFile(packageName string, filename string, file *ast.File, originalCode *string, output *RootOutput) string {
 	var componentCodes []string
 	var controllerCodes []string
+
+	importsMap := make(map[string]string)
+	for _, importSpec := range file.Imports {
+		importPath := strings.Replace(strings.ReplaceAll(importSpec.Path.Value, "\"", ""), "/src/", "/dist/", 1)
+		pkgName := ""
+
+		if importSpec.Name != nil {
+			pkgName = importSpec.Name.Name
+		} else {
+			splitedPath := strings.Split(importPath, "/")
+			pkgName = splitedPath[len(splitedPath)-1]
+		}
+		importsMap[pkgName] = importPath
+	}
 
 	// Controller & Service
 	for _, declare := range file.Decls {
@@ -60,7 +75,7 @@ func processFile(packageName string, filename string, file *ast.File, originalCo
 			}
 
 			if receiverName != "" {
-				processMapping(packageName, receiverName, *mappingAnnotaion, fn, originalCode, output)
+				processMapping(packageName, receiverName, *mappingAnnotaion, fn, originalCode, importsMap, output)
 			}
 		}
 	}
