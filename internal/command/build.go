@@ -9,6 +9,8 @@ import (
 )
 
 func Build() {
+	Cleanup()
+
 	generator.Generate()
 
 	fmt.Println(">> go mod tidy...")
@@ -24,4 +26,6 @@ func Build() {
 		panic(err)
 	}
 	fmt.Println(">>> build success")
+
+	Cleanup()
 }
