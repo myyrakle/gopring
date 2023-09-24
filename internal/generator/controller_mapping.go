@@ -195,6 +195,24 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 
 				parameterListToMapping = append(parameterListToMapping, pathName)
 				codeListBeforeMappingCall = append(codeListBeforeMappingCall, code)
+				continue
+			}
+
+			if strings.Contains(commentText, "@RequestParam") {
+				annotationParameters := annotation.ParseParameters(commentText)
+				pathName := ""
+
+				if len(annotationParameters) == 0 {
+					pathName = paramName
+				} else {
+					pathName = annotationParameters[0]
+				}
+
+				code := fmt.Sprintf(`	%s := c.QueryParam("%s")`, pathName, pathName)
+
+				parameterListToMapping = append(parameterListToMapping, pathName)
+				codeListBeforeMappingCall = append(codeListBeforeMappingCall, code)
+				continue
 			}
 		}
 	}
