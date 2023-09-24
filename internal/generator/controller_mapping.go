@@ -239,9 +239,9 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 				}
 
 				code := fmt.Sprintf(`		%s := %s{}
-		if err := c.Bind(body); err != nil {
+		if err := c.Bind(&%s); err != nil {
 			return err
-		}`, bodyVariableName, typeName)
+		}`, bodyVariableName, typeName, bodyVariableName)
 
 				parameterListToMapping = append(parameterListToMapping, bodyVariableName)
 				codeListBeforeMappingCall = append(codeListBeforeMappingCall, code)
