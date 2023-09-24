@@ -9,6 +9,8 @@ import (
 )
 
 func Run() {
+	Cleanup()
+
 	generator.Generate()
 
 	fmt.Println(">> go mod tidy...")
