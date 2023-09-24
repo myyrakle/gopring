@@ -7,7 +7,9 @@ import (
 	"strings"
 
 	"github.com/myyrakle/gopring/internal/annotation"
+	"github.com/myyrakle/gopring/internal/ast_util"
 	"github.com/myyrakle/gopring/internal/comment"
+	"github.com/myyrakle/gopring/pkg/alias"
 )
 
 func getMappingAnnotaion(ast *ast.FuncDecl) *annotation.Annotaion {
@@ -96,7 +98,7 @@ func getMappingAnnotaion(ast *ast.FuncDecl) *annotation.Annotaion {
 	return nil
 }
 
-func processMapping(packageName string, receiverName string, mappingAnnotaion annotation.Annotaion, fn *ast.FuncDecl, originalCode *string, output *RootOutput) {
+func processMapping(packageName string, receiverName string, mappingAnnotaion annotation.Annotaion, fn *ast.FuncDecl, originalCode *string, importsMap map[string]string, output *RootOutput) {
 	functionName := fn.Name.Name
 
 	// method 선택
@@ -160,6 +162,8 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 	startIndex := functionStartIndex
 	for _, param := range fn.Type.Params.List {
 		paramName := param.Names[0].Name
+		selecorName := ast_util.GetSelectorNameFromType(param.Type)
+		paramType := ast_util.GetTypeNameFromType(param.Type)
 
 		paramStartIndex := int(param.Pos()) - 1
 		paramEndIndex := int(param.End())
@@ -211,6 +215,34 @@ func processMapping(packageName string, receiverName string, mappingAnnotaion an
 				code := fmt.Sprintf(`		%s := c.QueryParam("%s")`, pathName, pathName)
 
 				parameterListToMapping = append(parameterListToMapping, pathName)
+				codeListBeforeMappingCall = append(codeListBeforeMappingCall, code)
+				continue
+			}
+
+			if strings.Contains(commentText, "@RequestBody") {
+				bodyVariableName := "body"
+
+				typeName := ""
+
+				if selecorName != nil {
+					importPath := importsMap[*selecorName]
+					packageAlias := alias.GetNextPackageAlias()
+
+					importPackage := fmt.Sprintf("\t%s \"%s\"", packageAlias, importPath)
+					output.ImportPackages[packageAlias] = importPackage
+					alias.PackageAliasRefCount[packageAlias]++
+
+					typeName = fmt.Sprintf("%s.%s", packageAlias, *paramType)
+				} else {
+					typeName = *paramType
+				}
+
+				code := fmt.Sprintf(`		%s := %s{}
+		if err := c.Bind(body); err != nil {
+			return err
+		}`, bodyVariableName, typeName)
+
+				parameterListToMapping = append(parameterListToMapping, bodyVariableName)
 				codeListBeforeMappingCall = append(codeListBeforeMappingCall, code)
 				continue
 			}
