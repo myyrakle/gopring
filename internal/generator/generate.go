@@ -38,19 +38,26 @@ func generateRecursive(basedir string, output *RootOutput) {
 		importPackage := "\t" + packageAlias + " \"" + ModuleName + "/" + strings.Replace(basedir, "src/", "dist/", 1) + "\""
 		output.ImportPackages[packageAlias] = importPackage
 
-		for filename, file := range asts.Files {
-			fmt.Printf(">> scan [%s]...\n", filename)
+		for filename, _ := range asts.Files {
+			fset := token.NewFileSet()
 
-			text, err := os.ReadFile(filename)
+			fmt.Printf(">> scan [%s]...\n", filename)
+			file, err := parser.ParseFile(fset, filename, nil, parser.ParseComments)
 
 			if err != nil {
 				panic(err)
 			}
 
-			originalCode := string(text)
+			originalBytes, err := os.ReadFile(filename)
+
+			if err != nil {
+				panic(err)
+			}
+
+			originalCode := string(originalBytes)
 			replacedCode := replaceImportPath(originalCode)
 
-			codeToAppend := processFile(packageAlias, filename, file, &originalCode, output)
+			codeToAppend := processFile(packageAlias, filename, file, &originalCode, originalBytes, output)
 
 			newPath := strings.Replace(filename, "src", output.OutputBasedir, 1)
 
